@@ -17,7 +17,7 @@ struct ConcertDetail: View {
             Text("\(concert.date.formatted()) - \(concert.venue.name)").listRowSeparator(.hidden)
 
             Section(header: Text("Obras")) {
-                ForEach(concert.performances) { performance in
+                ForEach(concert.performances.sorted { !$0.encore && $1.encore }) { performance in
                     NavigationLink {
                         WorkDetail(work: performance.work)
                     } label: {

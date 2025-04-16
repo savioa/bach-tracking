@@ -116,7 +116,7 @@ struct ConcertEditor: View {
                 series = concert.series
                 seriesInstance =
                     concert.seriesInstance != nil ? String(concert.seriesInstance!) : ""
-                performances = concert.performances
+                performances = concert.performances.sorted { !$0.encore && $1.encore }
                 newConcert = false
             }
         }
@@ -155,6 +155,7 @@ struct PerformanceEditor: View {
     @State private var work: Work?
     @State private var detail: String = ""
     @State private var artists: [Artist] = []
+    @State private var isEncore: Bool = false
     @State private var isAddingArtist: Bool = false
 
     @Query(sort: \Composer.shortName) private var composers: [Composer]
@@ -184,6 +185,12 @@ struct PerformanceEditor: View {
                         items: composer?.works.sorted { $0.primaryTitle < $1.primaryTitle } ?? [],
                         selection: $work, label: { $0.primaryTitle }
                     )
+
+                    Picker("Bis", selection: $isEncore) {
+                        Text("-").tag(false)
+                        Text("Bis").tag(true)
+                    }
+                    .pickerStyle(.segmented)
 
                     TextField("Detalhe", text: $detail)
                 }
@@ -245,7 +252,9 @@ struct PerformanceEditor: View {
 
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Adicionar") {
-                        onAdd(Performance(work: work!, artists: artists, detail: detail))
+                        onAdd(
+                            Performance(
+                                work: work!, artists: artists, detail: detail, encore: isEncore))
                         dismiss()
                     }
                     .disabled(artists.isEmpty || work == nil)
@@ -276,6 +285,10 @@ struct ArtistListEditor: View {
                     )
                     .onChange(of: artistType) {
                         artist = nil
+
+                        if let artistType: ArtistType, artistType.artists.count == 1 {
+                            artist = artistType.artists.first
+                        }
                     }
 
                     CustomMenuPicker(

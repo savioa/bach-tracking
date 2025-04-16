@@ -53,7 +53,8 @@ struct MultilinePerformanceRow: View {
 
     var body: some View {
         let firstLine: Text = Text(
-            performance.work.primaryTitle
+            (performance.encore ? "* " : "")
+                + performance.work.primaryTitle
                 + (performance.detail.isEmpty ? "" : " (\(performance.detail))"))
         let secondLine: Text = Text(performance.work.composer.shortName)
 

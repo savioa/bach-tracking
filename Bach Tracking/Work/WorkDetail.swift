@@ -29,15 +29,16 @@ struct WorkDetail: View {
 
             if !work.performances.isEmpty {
                 Section("Execuções") {
-                    ForEach(
-                        work.performances.sorted { $0.concert!.date > $1.concert!.date }
+                    let concerts: [Concert] = Array(Set(work.performances.compactMap { $0.concert }))
+
+                    ForEach(concerts.sorted { $0.date > $1.date }
                     ) { performance in
                         NavigationLink {
-                            ConcertDetail(concert: performance.concert!)
+                            ConcertDetail(concert: performance)
                         } label: {
                             MultilineRow(
-                                firstLine: Text(performance.concert!.title),
-                                secondLine: Text(performance.concert!.date.formatted()))
+                                firstLine: Text(performance.title),
+                                secondLine: Text(performance.date.formatted()))
                         }
                     }
                 }
