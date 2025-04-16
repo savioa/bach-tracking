@@ -83,7 +83,7 @@ struct WorkDetail: View {
         opus: "",
         catalogue: "GB 118",
         form: symphony,
-        tonality: Work.Tonality.c,
+        tonality: Work.Tonality.cMajor,
         nickname: "",
         number: "",
         composer: bizet,

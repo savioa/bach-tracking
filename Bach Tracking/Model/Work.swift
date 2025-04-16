@@ -22,35 +22,37 @@ class Work: Identifiable {
     }
 
     @Transient var derivedTitle: String {
-        var derivedTitle: String = ""
+        var parts: [String] = []
 
         if let form: MusicalForm {
-            derivedTitle += "\(form.name) "
+            parts.append("\(form.name)")
         }
 
         if !self.instruments.isEmpty {
-            derivedTitle += " para \(self.instruments) "
+            parts.append("para \(self.instruments)")
         }
 
         if !self.number.isEmpty {
-            derivedTitle += " n.º \(self.number) "
+            parts.append("n.º \(self.number)")
         }
 
         if let tonality: Work.Tonality {
-            derivedTitle += " em \(tonality.rawValue) "
+            parts.append("em \(tonality.rawValue)")
         }
 
         if !self.opus.isEmpty {
-            derivedTitle += ", Op. \(self.opus) "
+            parts.append(", Op. \(self.opus)")
         }
 
         if !self.catalogue.isEmpty {
-            derivedTitle += ", \(self.catalogue) "
+            parts.append(", \(self.catalogue) ")
         }
 
         if !self.nickname.isEmpty {
-            derivedTitle += ", “\(self.nickname)” "
+            parts.append(", “\(self.nickname)”")
         }
+
+        var derivedTitle: String = parts.joined(separator: " ")
 
         if !derivedTitle.isEmpty {
             derivedTitle =
@@ -89,9 +91,9 @@ class Work: Identifiable {
     }
 
     enum Tonality: String, CaseIterable, Identifiable, Codable {
-        case c = "Dó maior"
-        case a = "Lá maior"
-        case eb = "Mi bemol maior"
+        case cMajor = "Dó maior"
+        case aMajor = "Lá maior"
+        case ebFlatMajor = "Mi bemol maior"
 
         var id: String { self.rawValue }
     }
