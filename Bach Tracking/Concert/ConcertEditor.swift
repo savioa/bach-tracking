@@ -114,8 +114,7 @@ struct ConcertEditor: View {
                 date = concert.date
                 venue = concert.venue
                 series = concert.series
-                seriesInstance =
-                    concert.seriesInstance != nil ? String(concert.seriesInstance!) : ""
+                seriesInstance = concert.seriesInstance.map(String.init) ?? ""
                 performances = concert.performances.sorted { !$0.encore && $1.encore }
                 newConcert = false
             }

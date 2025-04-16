@@ -24,8 +24,8 @@ class Work: Identifiable {
     @Transient var derivedTitle: String {
         var derivedTitle: String = ""
 
-        if self.form != nil {
-            derivedTitle += "\(self.form!.name) "
+        if let form: MusicalForm {
+            derivedTitle += "\(form.name) "
         }
 
         if !self.instruments.isEmpty {
@@ -36,8 +36,8 @@ class Work: Identifiable {
             derivedTitle += " n.º \(self.number) "
         }
 
-        if self.tonality != nil {
-            derivedTitle += " em \(self.tonality!.rawValue) "
+        if let tonality: Work.Tonality {
+            derivedTitle += " em \(tonality.rawValue) "
         }
 
         if !self.opus.isEmpty {

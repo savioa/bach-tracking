@@ -126,21 +126,21 @@ struct Lists: View {
             })
 
             List {
-                if nextConcert != nil {
+                if let nextConcert: Concert {
                     Section(header: Text("Próximo concerto")) {
                         NavigationLink {
-                            ConcertDetail(concert: nextConcert!)
+                            ConcertDetail(concert: nextConcert)
                         } label: {
                             let composerNames: String = Set(
-                                nextConcert!.performances.compactMap { $0.work.composer }
+                                nextConcert.performances.compactMap { $0.work.composer }
                             )
                             .map { $0.shortName }
                             .joined(separator: ", ")
 
                             HStack(alignment: .firstTextBaseline) {
                                 VStack(alignment: .leading, spacing: 4) {
-                                    Text(nextConcert!.title).fontWeight(.heavy)
-                                    Text(nextConcert!.date.dayMonth)
+                                    Text(nextConcert.title).fontWeight(.heavy)
+                                    Text(nextConcert.date.dayMonth)
                                     Text(composerNames).font(.footnote).foregroundColor(
                                         .secondary)
                                 }

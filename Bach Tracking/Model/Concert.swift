@@ -13,12 +13,12 @@ class Concert: Identifiable {
     @Transient var title: String {
         var derivedTitle: String = ""
 
-        if series != nil {
-            derivedTitle = series!.name
+        if let series: Series {
+            derivedTitle = series.name
         }
 
-        if seriesInstance != nil {
-            derivedTitle += " \(String(seriesInstance!))"
+        if let seriesInstance: Int {
+            derivedTitle += " \(String(seriesInstance))"
         }
 
         if name.isEmpty {
