@@ -96,3 +96,29 @@ class Work: Identifiable {
         var id: String { self.rawValue }
     }
 }
+
+struct WorkDTO: Codable {
+    var name: String
+    var detail: String
+    var opus: String
+    var catalogue: String
+    var form: String?
+    var tonality: String?
+    var nickname: String
+    var number: String
+    var composer: ComposerDTO
+    var instruments: String
+
+    init(from work: Work) {
+        self.name = work.name
+        self.detail = work.detail
+        self.opus = work.opus
+        self.catalogue = work.catalogue
+        self.form = work.form?.name
+        self.tonality = work.tonality?.rawValue
+        self.nickname = work.nickname
+        self.number = work.number
+        self.composer = ComposerDTO(from: work.composer)
+        self.instruments = work.instruments
+    }
+}

@@ -15,3 +15,15 @@ class Performance: Identifiable {
         self.detail = detail
     }
 }
+
+struct PerformanceDTO: Codable {
+    var work: WorkDTO
+    var artists: [ArtistDTO]
+    var detail: String
+
+    init(from performance: Performance) {
+        self.work = WorkDTO(from: performance.work)
+        self.artists = performance.artists.map { ArtistDTO(from: $0) }
+        self.detail = performance.detail
+    }
+}

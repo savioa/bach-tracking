@@ -12,8 +12,8 @@
 	"argv": [
 		"/opt/homebrew/bin/xcode-build-server"
 	],
-	"workspace": "/Users/base/Code/Bach Tracking/Bach Tracking.xcodeproj/project.xcworkspace",
-	"build_root": "/Users/base/Library/Developer/Xcode/DerivedData/Bach_Tracking-frnuffjczxknvbbaynftyeivphet",
+	"workspace": "/Users/base/Code/bach-tracking/Bach Tracking.xcodeproj/project.xcworkspace",
+	"build_root": "/Users/base/Library/Developer/Xcode/DerivedData/Bach_Tracking-byhpdrestxmixpfrqwovkbynowoi",
 	"scheme": "Bach Tracking",
 	"kind": "xcode"
 }

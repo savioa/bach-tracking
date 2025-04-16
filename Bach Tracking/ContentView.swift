@@ -185,6 +185,18 @@ struct Lists: View {
                 .headerProminence(.increased)
             }
             .navigationTitle("Bach Tracking")
+            .onAppear {
+                let encoder: JSONEncoder = JSONEncoder()
+                encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+
+                concerts.forEach { concert in
+                    if let jsonData: Data = try? encoder.encode(ConcertDTO(from: concert)),
+                        let jsonString: String = String(data: jsonData, encoding: .utf8)
+                    {
+                        print(jsonString)
+                    }
+                }
+            }
         }
     }
 

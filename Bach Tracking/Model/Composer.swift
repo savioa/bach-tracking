@@ -16,3 +16,13 @@ class Composer: Identifiable {
         self.shortName = shortName
     }
 }
+
+struct ComposerDTO: Codable {
+    var fullName: String
+    var shortName: String
+
+    init(from composer: Composer) {
+        self.fullName = composer.fullName
+        self.shortName = composer.shortName
+    }
+}

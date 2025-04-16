@@ -40,3 +40,21 @@ class Concert: Identifiable {
         self.performances = performances
     }
 }
+
+struct ConcertDTO: Codable {
+    var name: String
+    var date: Date
+    var venue: String
+    var series: String?
+    var seriesInstance: Int?
+    var performances: [PerformanceDTO]
+
+    init(from concert: Concert) {
+        self.name = concert.name
+        self.date = concert.date
+        self.venue = concert.venue.name
+        self.series = concert.series?.name
+        self.seriesInstance = concert.seriesInstance
+        self.performances = concert.performances.map { PerformanceDTO(from: $0) }
+    }
+}

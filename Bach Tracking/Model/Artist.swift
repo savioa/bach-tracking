@@ -22,3 +22,13 @@ class Artist: Identifiable {
         self.type = type
     }
 }
+
+struct ArtistDTO: Codable {
+    var name: String
+    var type: String
+
+    init(from artist: Artist) {
+        self.name = artist.name
+        self.type = artist.type.name
+    }
+}
