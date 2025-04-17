@@ -24,7 +24,7 @@ class Work: Identifiable {
     @Transient var derivedTitle: String {
         var parts: [String] = []
 
-        if let form: MusicalForm {
+        if let form {
             parts.append("\(form.name)")
         }
 
@@ -36,7 +36,7 @@ class Work: Identifiable {
             parts.append("n.º \(self.number)")
         }
 
-        if let tonality: Work.Tonality {
+        if let tonality {
             parts.append("em \(tonality.rawValue)")
         }
 
@@ -52,7 +52,7 @@ class Work: Identifiable {
             parts.append(", “\(self.nickname)”")
         }
 
-        var derivedTitle: String = parts.joined(separator: " ")
+        var derivedTitle = parts.joined(separator: " ")
 
         if !derivedTitle.isEmpty {
             derivedTitle =

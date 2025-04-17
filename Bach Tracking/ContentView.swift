@@ -3,16 +3,16 @@ import SwiftData
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var searchManager: SearchManager = SearchManager()
+    @StateObject private var searchManager = SearchManager()
     @EnvironmentObject var spotlightManager: SpotlightNavigationManager
 
     @Query private var composers: [Composer]
     @Query private var works: [Work]
     @Query private var artists: [Artist]
 
-    @State private var navigationPath: NavigationPath = NavigationPath()
+    @State private var navigationPath = NavigationPath()
 
-    @State private var isShowingSpotlightItemDetail: Bool = false
+    @State private var isShowingSpotlightItemDetail = false
     @State private var selectedComposer: Composer?
     @State private var selectedWork: Work?
     @State private var selectedArtist: Artist?
@@ -26,11 +26,11 @@ struct ContentView: View {
                     prompt: "Buscar"
                 )
                 .navigationDestination(isPresented: $isShowingSpotlightItemDetail) {
-                    if let composer: Composer = selectedComposer {
+                    if let composer = selectedComposer {
                         ComposerDetail(composer: composer)
-                    } else if let work: Work = selectedWork {
+                    } else if let work = selectedWork {
                         WorkDetail(work: work)
-                    } else if let artist: Artist = selectedArtist {
+                    } else if let artist = selectedArtist {
                         ArtistDetail(artist: artist)
                     } else {
                         EmptyView()
@@ -43,17 +43,17 @@ struct ContentView: View {
 
                     switch spotlightManager.selectedItemType {
                     case "composer":
-                        if let composer: Composer = composers.first(where: { $0.id == id }) {
+                        if let composer = composers.first(where: { $0.id == id }) {
                             selectedComposer = composer
                             isShowingSpotlightItemDetail = true
                         }
                     case "work":
-                        if let work: Work = works.first(where: { $0.id == id }) {
+                        if let work = works.first(where: { $0.id == id }) {
                             selectedWork = work
                             isShowingSpotlightItemDetail = true
                         }
                     case "artist":
-                        if let artist: Artist = artists.first(where: { $0.id == id }) {
+                        if let artist = artists.first(where: { $0.id == id }) {
                             selectedArtist = artist
                             isShowingSpotlightItemDetail = true
                         }
@@ -121,17 +121,48 @@ struct Lists: View {
                 }
             }
         } else {
-            let nextConcert: Concert? = concerts.first(where: { (concert: Concert) -> Bool in
+            let calendar = Calendar.current
+            let oneYearAgo = calendar.date(byAdding: .year, value: -1, to: Date())!
+            let target = calendar.dateComponents([.year, .month, .day], from: oneYearAgo)
+            let previousConcert = concerts.first { concert in
+                return
+                    calendar.dateComponents([.year, .month, .day], from: concert.date) == target
+            }
+
+            let nextConcert = concerts.first(where: { (concert: Concert) -> Bool in
                 return concert.date > Date.now
             })
 
             List {
-                if let nextConcert: Concert {
+                if let previousConcert {
+                    Section(header: Text("Um ano atrás")) {
+                        NavigationLink {
+                            ConcertDetail(concert: previousConcert)
+                        } label: {
+                            let composerNames = Set(
+                                previousConcert.performances.compactMap { $0.work.composer }
+                            )
+                            .map { $0.shortName }
+                            .joined(separator: ", ")
+
+                            HStack(alignment: .firstTextBaseline) {
+                                VStack(alignment: .leading, spacing: 4) {
+                                    Text(previousConcert.title).fontWeight(.heavy)
+                                    Text(composerNames).font(.footnote).foregroundColor(
+                                        .secondary)
+                                }
+                            }
+                        }
+                    }
+                    .headerProminence(.increased)
+                }
+
+                if let nextConcert {
                     Section(header: Text("Próximo concerto")) {
                         NavigationLink {
                             ConcertDetail(concert: nextConcert)
                         } label: {
-                            let composerNames: String = Set(
+                            let composerNames = Set(
                                 nextConcert.performances.compactMap { $0.work.composer }
                             )
                             .map { $0.shortName }
@@ -149,6 +180,7 @@ struct Lists: View {
                     }
                     .headerProminence(.increased)
                 }
+
                 Section {
                     MainNavigationLink(
                         title: "Concertos", count: concerts.count
@@ -186,16 +218,20 @@ struct Lists: View {
             }
             .navigationTitle("Bach Tracking")
             .onAppear {
-                let encoder: JSONEncoder = JSONEncoder()
+                let encoder = JSONEncoder()
                 encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
 
                 concerts.forEach { concert in
-                    if let jsonData: Data = try? encoder.encode(ConcertDTO(from: concert)),
-                        let jsonString: String = String(data: jsonData, encoding: .utf8)
-                    {
-                        print(jsonString)
+                    if let jsonData = try? encoder.encode(ConcertDTO(from: concert)) {
+                        if let jsonString = String(data: jsonData, encoding: .utf8) {
+                            print(jsonString)
+                        }
                     }
                 }
+
+                UNUserNotificationCenter.current().requestAuthorization(
+                    options: [.alert, .badge, .sound]) { _, _ in
+                    }
             }
         }
     }
@@ -238,8 +274,8 @@ struct MainNavigationLink<Destination: View>: View {
 }
 
 class SearchManager: ObservableObject {
-    @Published var searchText: String = ""
-    @Published var debouncedSearchText: String = ""
+    @Published var searchText = ""
+    @Published var debouncedSearchText = ""
 
     private var cancellables: Set<AnyCancellable> = Set<AnyCancellable>()
 

@@ -3,6 +3,7 @@ import SwiftData
 
 @Model
 class Concert: Identifiable {
+    var id: UUID
     var date: Date
     var venue: Venue
     var series: Series?
@@ -11,13 +12,13 @@ class Concert: Identifiable {
     var performances: [Performance]
 
     @Transient var title: String {
-        var derivedTitle: String = ""
+        var derivedTitle = ""
 
-        if let series: Series {
+        if let series {
             derivedTitle = series.name
         }
 
-        if let seriesInstance: Int {
+        if let seriesInstance {
             derivedTitle += " \(String(seriesInstance))"
         }
 
@@ -29,9 +30,11 @@ class Concert: Identifiable {
     }
 
     init(
-        date: Date, venue: Venue, series: Series?, seriesInstance: Int?, name: String,
+        id: UUID = UUID(), date: Date, venue: Venue, series: Series?, seriesInstance: Int?,
+        name: String,
         performances: [Performance]
     ) {
+        self.id = id
         self.date = date
         self.venue = venue
         self.series = series

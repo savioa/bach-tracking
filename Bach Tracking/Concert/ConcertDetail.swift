@@ -28,7 +28,7 @@ struct ConcertDetail: View {
             .headerProminence(.increased)
 
             Section(header: Text("Artistas")) {
-                let artists: [Artist] = Set(concert.performances.flatMap { $0.artists })
+                let artists = Set(concert.performances.flatMap { $0.artists })
                     .sorted { $0.name < $1.name }
 
                 ForEach(artists) { artist in
@@ -74,6 +74,9 @@ struct ConcertDetail: View {
                     concert.performances.forEach { performance in
                         modelContext.delete(performance)
                     }
+
+                    UNUserNotificationCenter.current().removePendingNotificationRequests(
+                        withIdentifiers: [concert.id.uuidString])
                 }
             }
     }

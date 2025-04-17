@@ -70,7 +70,7 @@ struct ConcertEditor: View {
                 .headerProminence(.increased)
 
                 if !performances.isEmpty {
-                    let uniqueArtists: [Artist] = Set(performances.flatMap { $0.artists })
+                    let uniqueArtists = Set(performances.flatMap { $0.artists })
                         .sorted { $0.name < $1.name }
 
                     Section("Artistas") {
@@ -109,7 +109,7 @@ struct ConcertEditor: View {
             }
         }
         .onAppear {
-            if let concert: Concert {
+            if let concert {
                 name = concert.name
                 date = concert.date
                 venue = concert.venue
@@ -122,7 +122,7 @@ struct ConcertEditor: View {
     }
 
     func save() {
-        if let concert: Concert {
+        if let concert {
             removedPerformances.forEach { performance in
                 modelContext.delete(performance)
             }
@@ -134,7 +134,7 @@ struct ConcertEditor: View {
             concert.seriesInstance = instance
             concert.performances = performances
         } else {
-            let concert: Concert = Concert(
+            let concert = Concert(
                 date: date, venue: venue!, series: series, seriesInstance: instance,
                 name: name.trimmed, performances: performances)
 
@@ -143,7 +143,35 @@ struct ConcertEditor: View {
 
         try? modelContext.save()
 
+        registerNotification()
+
         dismiss()
+    }
+
+    fileprivate func registerNotification() {
+        if let concert {
+            let content = UNMutableNotificationContent()
+            content.title = "Um ano atrás..."
+            content.subtitle = "\(concert.title)"
+            content.body = concert.performances.compactMap { $0.work.composer.shortName }.joined(
+                separator: ", ")
+            content.sound = UNNotificationSound.default
+
+            let oneYearLater = Calendar.current.date(byAdding: .year, value: 1, to: concert.date)!
+
+            var dateComponents = Calendar.current.dateComponents(
+                [.year, .month, .day], from: oneYearLater)
+            dateComponents.hour = 9
+
+            let trigger = UNCalendarNotificationTrigger(
+                dateMatching: dateComponents, repeats: false)
+
+            let request = UNNotificationRequest(
+                identifier: concert.id.uuidString, content: content,
+                trigger: trigger)
+
+            UNUserNotificationCenter.current().add(request)
+        }
     }
 }
 
@@ -174,7 +202,7 @@ struct PerformanceEditor: View {
                     .onChange(of: composer) {
                         work = nil
 
-                        if let composer: Composer, composer.works.count == 1 {
+                        if let composer, composer.works.count == 1 {
                             work = composer.works.first
                         }
                     }
@@ -216,7 +244,7 @@ struct PerformanceEditor: View {
                 }
                 .headerProminence(.increased)
 
-                let suggestions: [Artist] = referencedArtists.filter { referenced in
+                let suggestions = referencedArtists.filter { referenced in
                     !artists.contains(where: { $0.id == referenced.id })
                 }
 
@@ -285,7 +313,7 @@ struct ArtistListEditor: View {
                     .onChange(of: artistType) {
                         artist = nil
 
-                        if let artistType: ArtistType, artistType.artists.count == 1 {
+                        if let artistType, artistType.artists.count == 1 {
                             artist = artistType.artists.first
                         }
                     }
