@@ -3,12 +3,11 @@ import SwiftData
 import SwiftUI
 
 struct ContentView: View {
-    @StateObject private var searchManager = SearchManager()
+    @Environment(\.modelContext) private var modelContext: ModelContext
+
     @EnvironmentObject var spotlightManager: SpotlightNavigationManager
 
-    @Query private var composers: [Composer]
-    @Query private var works: [Work]
-    @Query private var artists: [Artist]
+    @StateObject private var searchManager = SearchManager()
 
     @State private var navigationPath = NavigationPath()
 
@@ -43,17 +42,17 @@ struct ContentView: View {
 
                     switch spotlightManager.selectedItemType {
                     case "composer":
-                        if let composer = composers.first(where: { $0.id == id }) {
+                        if let composer = fetchById(Composer.self, id: id, using: modelContext) {
                             selectedComposer = composer
                             isShowingSpotlightItemDetail = true
                         }
                     case "work":
-                        if let work = works.first(where: { $0.id == id }) {
+                        if let work = fetchById(Work.self, id: id, using: modelContext) {
                             selectedWork = work
                             isShowingSpotlightItemDetail = true
                         }
                     case "artist":
-                        if let artist = artists.first(where: { $0.id == id }) {
+                        if let artist = fetchById(Artist.self, id: id, using: modelContext) {
                             selectedArtist = artist
                             isShowingSpotlightItemDetail = true
                         }
@@ -68,19 +67,24 @@ struct ContentView: View {
                 }
         }
     }
+
+    func fetchById<T: PersistentModel>(
+        _ type: T.Type,
+        id: UUID,
+        using modelContext: ModelContext
+    ) -> T? where T.ID == UUID {
+        let predicate = #Predicate<T> { $0.id == id }
+        let descriptor = FetchDescriptor<T>(predicate: predicate)
+
+        return try? modelContext.fetch(descriptor).first
+    }
 }
 
 struct Lists: View {
     @Environment(\.isSearching) private var isSearching: Bool
+    @Environment(\.modelContext) private var modelContext: ModelContext
 
     @Query(sort: \Concert.date) private var concerts: [Concert]
-    @Query private var composers: [Composer]
-    @Query private var artists: [Artist]
-    @Query private var artistTypes: [ArtistType]
-    @Query private var seriesList: [Series]
-    @Query private var venues: [Venue]
-    @Query private var forms: [MusicalForm]
-    @Query private var works: [Work]
 
     @ObservedObject var searchManager: SearchManager
 
@@ -183,15 +187,15 @@ struct Lists: View {
 
                 Section {
                     MainNavigationLink(
-                        title: "Concertos", count: concerts.count
+                        title: "Concertos", count: concertCount
                     ) { ConcertList() }
 
                     MainNavigationLink(
-                        title: "Artistas", count: artists.count
+                        title: "Artistas", count: artistCount
                     ) { ArtistList() }
 
                     MainNavigationLink(
-                        title: "Compositores", count: composers.count
+                        title: "Compositores", count: composerCount
                     ) {
                         ComposerList()
                     }
@@ -199,19 +203,19 @@ struct Lists: View {
 
                 Section(header: Text("Definições")) {
                     MainNavigationLink(
-                        title: ArtistType.self.pluralFormItemName, count: artistTypes.count
+                        title: ArtistType.self.pluralFormItemName, count: artistTypeCount
                     ) { NameableItemList<ArtistType>() }
 
                     MainNavigationLink(
-                        title: Series.self.pluralFormItemName, count: seriesList.count
+                        title: Series.self.pluralFormItemName, count: seriesCount
                     ) { NameableItemList<Series>() }
 
                     MainNavigationLink(
-                        title: MusicalForm.self.pluralFormItemName, count: forms.count
+                        title: MusicalForm.self.pluralFormItemName, count: formCount
                     ) { NameableItemList<MusicalForm>() }
 
                     MainNavigationLink(
-                        title: Venue.self.pluralFormItemName, count: venues.count
+                        title: Venue.self.pluralFormItemName, count: venueCount
                     ) { NameableItemList<Venue>() }
                 }
                 .headerProminence(.increased)
@@ -236,24 +240,52 @@ struct Lists: View {
         }
     }
 
+    var composerCount: Int { count(Composer.self, using: modelContext) }
+    var artistCount: Int { count(Artist.self, using: modelContext) }
+    var concertCount: Int { count(Concert.self, using: modelContext) }
+    var artistTypeCount: Int { count(ArtistType.self, using: modelContext) }
+    var seriesCount: Int { count(Series.self, using: modelContext) }
+    var formCount: Int { count(MusicalForm.self, using: modelContext) }
+    var venueCount: Int { count(Venue.self, using: modelContext) }
+
     var filteredArtists: [Artist] {
-        artists.filter {
-            $0.name.localizedCaseInsensitiveContains(searchManager.debouncedSearchText)
-        }
+        let searchText = searchManager.debouncedSearchText
+
+        return fetchModels(
+            of: Artist.self,
+            matching: #Predicate<Artist> { $0.name.localizedStandardContains(searchText) },
+            using: modelContext)
     }
 
     var filteredComposers: [Composer] {
-        composers.filter {
-            $0.fullName.localizedCaseInsensitiveContains(searchManager.debouncedSearchText)
-        }
+        let searchText = searchManager.debouncedSearchText
+
+        return fetchModels(
+            of: Composer.self,
+            matching: #Predicate<Composer> { $0.fullName.localizedStandardContains(searchText) },
+            using: modelContext)
     }
 
     var filteredWorks: [Work] {
-        works.filter {
-            $0.primaryTitle.localizedCaseInsensitiveContains(searchManager.debouncedSearchText)
-                || $0.derivedTitle.localizedCaseInsensitiveContains(
-                    searchManager.debouncedSearchText)
-        }
+        let searchText = searchManager.debouncedSearchText
+
+        return fetchModels(
+            of: Work.self,
+            matching: #Predicate<Work> { $0.name.localizedStandardContains(searchText) },
+            using: modelContext)
+    }
+
+    func count<T: PersistentModel>(_ type: T.Type, using modelContext: ModelContext) -> Int {
+        (try? modelContext.fetchCount(FetchDescriptor<T>())) ?? 0
+    }
+
+    func fetchModels<T: PersistentModel>(
+        of type: T.Type,
+        matching predicate: Predicate<T>,
+        using modelContext: ModelContext
+    ) -> [T] {
+        let descriptor = FetchDescriptor<T>(predicate: predicate)
+        return (try? modelContext.fetch(descriptor)) ?? []
     }
 }
 

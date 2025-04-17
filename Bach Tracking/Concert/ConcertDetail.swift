@@ -8,8 +8,6 @@ struct ConcertDetail: View {
     @State private var isEditing: Bool = false
     @State private var isDeleting: Bool = false
 
-    @Query private var concerts: [Concert]
-
     let concert: Concert
 
     var body: some View {
