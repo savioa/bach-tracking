@@ -2,7 +2,7 @@ import SwiftData
 import SwiftUI
 
 struct ConcertList: View {
-    @State private var isAdding: Bool = false
+    @State private var isAdding = false
 
     @Query private var concerts: [Concert]
 
@@ -22,7 +22,7 @@ struct ConcertList: View {
 
         List {
             ForEach(Array(groupedConcerts.keys.sorted()), id: \.self) { yearMonth in
-                Section(header: Text(formatter.string(for: groupedConcerts[yearMonth]![0].date)!)) {
+                ProminentSection(formatter.string(for: groupedConcerts[yearMonth]![0].date)!) {
                     let concertsByMonth: [Concert]? = groupedConcerts[yearMonth]?.sorted {
                         $0.date > $1.date
                     }
@@ -35,7 +35,6 @@ struct ConcertList: View {
                         }
                     }
                 }
-                .headerProminence(.increased)
             }
         }
         .navigationTitle("Concertos")

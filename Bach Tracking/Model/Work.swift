@@ -92,8 +92,29 @@ class Work: Identifiable {
 
     enum Tonality: String, CaseIterable, Identifiable, Codable {
         case cMajor = "Dó maior"
+        case gMajor = "Sol maior"
+        case dMajor = "Ré maior"
         case aMajor = "Lá maior"
-        case ebFlatMajor = "Mi bemol maior"
+        case ebMajor = "Mi maior"
+        case bMajor = "Si maior"
+        case fSharpMajor = "Fá sustenido maior"
+        case dFlatMajor = "Ré bemol maior"
+        case aFlatMajor = "Lá bemol maior"
+        case eFlatMajor = "Mi bemol maior"
+        case bFlatMajor = "Si bemol maior"
+        case fMajor = "Fá maior"
+        case aMinor = "Lá menor"
+        case eMinor = "Mi menor"
+        case bMinor = "Si menor"
+        case fSharpMinor = "Fá sustenido menor"
+        case cSharpMinor = "Dó sustenido menor"
+        case aFlatMinor = "Lá bemol menor"
+        case dSharpMinor = "Ré sustenido menor"
+        case bFlatMinor = "Si bemol menor"
+        case fMinor = "Fá menor"
+        case cMinor = "Dó menor"
+        case gMinor = "Sol menor"
+        case dMinor = "Ré menor"
 
         var id: String { self.rawValue }
     }

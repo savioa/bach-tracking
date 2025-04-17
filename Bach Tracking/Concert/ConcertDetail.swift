@@ -5,8 +5,8 @@ struct ConcertDetail: View {
     @Environment(\.dismiss) var dismiss: DismissAction
     @Environment(\.modelContext) private var modelContext: ModelContext
 
-    @State private var isEditing: Bool = false
-    @State private var isDeleting: Bool = false
+    @State private var isEditing = false
+    @State private var isDeleting = false
 
     let concert: Concert
 
@@ -14,7 +14,7 @@ struct ConcertDetail: View {
         List {
             Text("\(concert.date.formatted()) - \(concert.venue.name)").listRowSeparator(.hidden)
 
-            Section(header: Text("Obras")) {
+            ProminentSection("Obras") {
                 ForEach(concert.performances.sorted { !$0.encore && $1.encore }) { performance in
                     NavigationLink {
                         WorkDetail(work: performance.work)
@@ -23,9 +23,8 @@ struct ConcertDetail: View {
                     }
                 }
             }
-            .headerProminence(.increased)
 
-            Section(header: Text("Artistas")) {
+            ProminentSection("Artistas") {
                 let artists = Set(concert.performances.flatMap { $0.artists })
                     .sorted { $0.name < $1.name }
 
@@ -37,13 +36,9 @@ struct ConcertDetail: View {
                     }
                 }
             }
-            .headerProminence(.increased)
 
             if concert.title.count > 20 {
-                Section("Nome") {
-                    Text(concert.title)
-                }
-                .headerProminence(.increased)
+                ProminentSection("Nome") { Text(concert.title) }
             }
         }
         .listStyle(.plain)
@@ -52,11 +47,7 @@ struct ConcertDetail: View {
         .sheet(isPresented: $isEditing) {
             ConcertEditor(concert: concert)
         }
-        .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button("Editar") { isEditing = true }
-            }
-        }
+        .toolbar { EditButtonToolbarItem(isEditing: $isEditing) }
 
         Button("Apagar", role: .destructive) { isDeleting = true }
             .buttonStyle(.bordered)

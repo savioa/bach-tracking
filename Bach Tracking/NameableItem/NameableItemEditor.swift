@@ -5,8 +5,8 @@ struct NameableItemEditor<T: Nameable & PersistentModel>: View {
     @Environment(\.dismiss) var dismiss: DismissAction
     @Environment(\.modelContext) private var modelContext: ModelContext
 
-    @State private var name: String = ""
-    @State private var newItem: Bool = true
+    @State private var name = ""
+    @State private var navigationTitle = T.newItemLabel
 
     let item: T?
 
@@ -17,22 +17,16 @@ struct NameableItemEditor<T: Nameable & PersistentModel>: View {
                     TextField("Nome", text: $name)
                 }
             }
-            .navigationTitle(newItem ? T.newItemLabel : "")
+            .navigationTitle(navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancelar", role: .cancel) { dismiss() }
-                }
-
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Salvar") { save() }.disabled(name.isEmpty)
-                }
+                FormToolbar.items(isConfirmDisabled: name.isEmpty, onConfirm: { save() })
             }
         }
         .onAppear {
             if let item: T {
                 name = item.name
-                newItem = false
+                navigationTitle = ""
             }
         }
     }

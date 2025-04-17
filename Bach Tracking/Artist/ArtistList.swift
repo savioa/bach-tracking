@@ -2,8 +2,8 @@ import SwiftData
 import SwiftUI
 
 struct ArtistList: View {
-    @State private var query: String = ""
-    @State private var isAdding: Bool = false
+    @State private var query = ""
+    @State private var isAdding = false
 
     @Query private var artists: [Artist]
 
@@ -22,7 +22,7 @@ struct ArtistList: View {
 
         List {
             ForEach(Array(groupedArtists.keys.sorted()), id: \.self) { firstLetter in
-                Section(header: Text(firstLetter)) {
+                ProminentSection(header: Text(firstLetter)) {
                     let artistsByLetter: [Artist]? = groupedArtists[firstLetter]?.sorted {
                         $0.name < $1.name
                     }
@@ -35,7 +35,6 @@ struct ArtistList: View {
                         }
                     }
                 }
-                .headerProminence(.increased)
             }
         }
         .navigationTitle("Artistas")

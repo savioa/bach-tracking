@@ -6,8 +6,8 @@ struct ComposerDetail: View {
     @Environment(\.dismiss) var dismiss: DismissAction
     @Environment(\.modelContext) private var modelContext: ModelContext
 
-    @State private var isEditing: Bool = false
-    @State private var isAddingWork: Bool = false
+    @State private var isEditing = false
+    @State private var isAddingWork = false
 
     let composer: Composer
 
@@ -17,7 +17,7 @@ struct ComposerDetail: View {
 
             Portrait(name: composer.shortName)
 
-            Section(
+            ProminentSection(
                 header: SectionHeaderWithAddButton(
                     sectionHeaderText: "Obras", accessibilityLabel: "Adicionar nova obra",
                     isAdding: $isAddingWork)
@@ -34,7 +34,6 @@ struct ComposerDetail: View {
                     }
                 }
             }
-            .headerProminence(.increased)
         }
         .listStyle(.plain)
         .navigationTitle(composer.shortName)
@@ -45,11 +44,7 @@ struct ComposerDetail: View {
         .sheet(isPresented: $isAddingWork) {
             WorkEditor(work: nil, composer: composer)
         }
-        .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button("Editar") { isEditing = true }
-            }
-        }
+        .toolbar { EditButtonToolbarItem(isEditing: $isEditing) }
 
         if composer.works.isEmpty {
             DeleteButton(item: composer) {

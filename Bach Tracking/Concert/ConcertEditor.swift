@@ -5,14 +5,14 @@ struct ConcertEditor: View {
     @Environment(\.dismiss) var dismiss: DismissAction
     @Environment(\.modelContext) private var modelContext: ModelContext
 
-    @State private var name: String = ""
-    @State private var date: Date = Date.now
+    @State private var name = ""
+    @State private var date = Date.now
     @State private var venue: Venue?
     @State private var series: Series?
-    @State private var seriesInstance: String = ""
+    @State private var seriesInstance = ""
     @State private var performances: [Performance] = []
-    @State private var newConcert: Bool = true
-    @State private var isAddingWork: Bool = false
+    @State private var navigationTitle = "Novo Concerto"
+    @State private var isAddingWork = false
     @State private var removedPerformances: [Performance] = []
 
     @Query(sort: \Venue.name) private var venues: [Venue]
@@ -46,7 +46,7 @@ struct ConcertEditor: View {
                     }
                 }
 
-                Section(
+                ProminentSection(
                     header: SectionHeaderWithAddButton(
                         sectionHeaderText: "Obras", accessibilityLabel: "Adicionar nova obra",
                         isAdding: $isAddingWork)
@@ -67,18 +67,16 @@ struct ConcertEditor: View {
                         }
                     }
                 }
-                .headerProminence(.increased)
 
                 if !performances.isEmpty {
                     let uniqueArtists = Set(performances.flatMap { $0.artists })
                         .sorted { $0.name < $1.name }
 
-                    Section("Artistas") {
+                    ProminentSection("Artistas") {
                         ForEach(uniqueArtists) { artist in
                             MultilineArtistRow(artist: artist)
                         }
                     }
-                    .headerProminence(.increased)
                 }
             }
             .onChange(of: series) {
@@ -86,7 +84,7 @@ struct ConcertEditor: View {
                     seriesInstance = ""
                 }
             }
-            .navigationTitle(newConcert ? "Novo Concerto" : "")
+            .navigationTitle(navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .sheet(isPresented: $isAddingWork) {
                 PerformanceEditor(
@@ -98,14 +96,9 @@ struct ConcertEditor: View {
                 }
             }
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancelar", role: .cancel) { dismiss() }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Salvar") { save() }
-                        .disabled(
-                            (name.isEmpty && series == nil) || performances.isEmpty || venue == nil)
-                }
+                FormToolbar.items(
+                    isConfirmDisabled: (name.isEmpty && series == nil) || performances.isEmpty
+                        || venue == nil, onConfirm: { save() })
             }
         }
         .onAppear {
@@ -116,7 +109,7 @@ struct ConcertEditor: View {
                 series = concert.series
                 seriesInstance = concert.seriesInstance.map(String.init) ?? ""
                 performances = concert.performances.sorted { !$0.encore && $1.encore }
-                newConcert = false
+                navigationTitle = ""
             }
         }
     }
@@ -180,10 +173,10 @@ struct PerformanceEditor: View {
 
     @State private var composer: Composer?
     @State private var work: Work?
-    @State private var detail: String = ""
+    @State private var detail = ""
     @State private var artists: [Artist] = []
-    @State private var isEncore: Bool = false
-    @State private var isAddingArtist: Bool = false
+    @State private var isEncore = false
+    @State private var isAddingArtist = false
 
     @Query(sort: \Composer.shortName) private var composers: [Composer]
 
@@ -222,7 +215,7 @@ struct PerformanceEditor: View {
                     TextField("Detalhe", text: $detail)
                 }
 
-                Section(
+                ProminentSection(
                     header: SectionHeaderWithAddButton(
                         sectionHeaderText: "Artistas", accessibilityLabel: "Adicionar novo artista",
                         isAdding: $isAddingArtist)
@@ -242,7 +235,6 @@ struct PerformanceEditor: View {
                         }
                     }
                 }
-                .headerProminence(.increased)
 
                 let suggestions = referencedArtists.filter { referenced in
                     !artists.contains(where: { $0.id == referenced.id })
@@ -273,19 +265,15 @@ struct PerformanceEditor: View {
                 }
             }
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancelar", role: .cancel) { dismiss() }
-                }
-
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Adicionar") {
+                FormToolbar.items(
+                    confirmLabel: "Adicionar",
+                    isConfirmDisabled: artists.isEmpty || work == nil,
+                    onConfirm: {
                         onAdd(
                             Performance(
                                 work: work!, artists: artists, detail: detail, encore: isEncore))
                         dismiss()
-                    }
-                    .disabled(artists.isEmpty || work == nil)
-                }
+                    })
             }
         }
     }
@@ -326,16 +314,13 @@ struct ArtistListEditor: View {
                 }
             }
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancelar", role: .cancel) { dismiss() }
-                }
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Adicionar") {
+                FormToolbar.items(
+                    confirmLabel: "Adicionar",
+                    isConfirmDisabled: artist == nil,
+                    onConfirm: {
                         onAdd(artist!)
                         dismiss()
-                    }
-                    .disabled(artist == nil)
-                }
+                    })
             }
         }
     }

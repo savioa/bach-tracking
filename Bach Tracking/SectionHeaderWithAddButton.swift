@@ -9,7 +9,7 @@ struct SectionHeaderWithAddButton: View {
         HStack {
             Text(sectionHeaderText)
             Spacer()
-            Button(action: { isAdding = true }) { Image(systemName: "plus") }
+            Button(action: { isAdding = true }, label: { Image(systemName: "plus") })
                 .buttonStyle(.borderless)
                 .accessibilityLabel(accessibilityLabel)
         }

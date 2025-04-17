@@ -92,36 +92,33 @@ struct Lists: View {
         if isSearching {
             List {
                 if !filteredArtists.isEmpty {
-                    Section("Artistas") {
+                    ProminentSection("Artistas") {
                         ForEach(filteredArtists) { artist in
                             NavigationLink(destination: ArtistDetail(artist: artist)) {
                                 MultilineArtistRow(artist: artist)
                             }
                         }
                     }
-                    .headerProminence(.increased)
                 }
 
                 if !filteredComposers.isEmpty {
-                    Section("Compositores") {
+                    ProminentSection("Compositores") {
                         ForEach(filteredComposers) { composer in
                             NavigationLink(destination: ComposerDetail(composer: composer)) {
                                 Text(composer.fullName)
                             }
                         }
                     }
-                    .headerProminence(.increased)
                 }
 
                 if !filteredWorks.isEmpty {
-                    Section("Obras") {
+                    ProminentSection("Obras") {
                         ForEach(filteredWorks) { work in
                             NavigationLink(destination: WorkDetail(work: work)) {
                                 MultilineWorkRow(work: work)
                             }
                         }
                     }
-                    .headerProminence(.increased)
                 }
             }
         } else {
@@ -139,7 +136,7 @@ struct Lists: View {
 
             List {
                 if let previousConcert {
-                    Section(header: Text("Um ano atrás")) {
+                    ProminentSection("Um ano atrás") {
                         NavigationLink {
                             ConcertDetail(concert: previousConcert)
                         } label: {
@@ -158,11 +155,10 @@ struct Lists: View {
                             }
                         }
                     }
-                    .headerProminence(.increased)
                 }
 
                 if let nextConcert {
-                    Section(header: Text("Próximo concerto")) {
+                    ProminentSection("Próximo concerto") {
                         NavigationLink {
                             ConcertDetail(concert: nextConcert)
                         } label: {
@@ -182,7 +178,6 @@ struct Lists: View {
                             }
                         }
                     }
-                    .headerProminence(.increased)
                 }
 
                 Section {
@@ -201,7 +196,7 @@ struct Lists: View {
                     }
                 }
 
-                Section(header: Text("Definições")) {
+                ProminentSection("Definições") {
                     MainNavigationLink(
                         title: ArtistType.self.pluralFormItemName, count: artistTypeCount
                     ) { NameableItemList<ArtistType>() }
@@ -218,7 +213,6 @@ struct Lists: View {
                         title: Venue.self.pluralFormItemName, count: venueCount
                     ) { NameableItemList<Venue>() }
                 }
-                .headerProminence(.increased)
             }
             .navigationTitle("Bach Tracking")
             .onAppear {

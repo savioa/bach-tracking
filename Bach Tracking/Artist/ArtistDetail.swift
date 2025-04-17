@@ -6,7 +6,7 @@ struct ArtistDetail: View {
     @Environment(\.dismiss) var dismiss: DismissAction
     @Environment(\.modelContext) private var modelContext: ModelContext
 
-    @State private var isEditing: Bool = false
+    @State private var isEditing = false
 
     let artist: Artist
 
@@ -17,7 +17,7 @@ struct ArtistDetail: View {
             Portrait(name: artist.name)
 
             if !artist.concerts.isEmpty {
-                Section(header: Text("Concertos")) {
+                ProminentSection("Concertos") {
                     ForEach(artist.concerts) { concert in
                         NavigationLink {
                             ConcertDetail(concert: concert)
@@ -26,14 +26,10 @@ struct ArtistDetail: View {
                         }
                     }
                 }
-                .headerProminence(.increased)
             }
 
             if artist.name.count > 20 {
-                Section("Nome") {
-                    Text(artist.name)
-                }
-                .headerProminence(.increased)
+                ProminentSection("Nome") { Text(artist.name) }
             }
         }
         .listStyle(.plain)
@@ -42,11 +38,7 @@ struct ArtistDetail: View {
         .sheet(isPresented: $isEditing) {
             ArtistEditor(artist: artist)
         }
-        .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button("Editar") { isEditing = true }
-            }
-        }
+        .toolbar { EditButtonToolbarItem(isEditing: $isEditing) }
 
         if artist.performances.isEmpty {
             DeleteButton(item: artist) {

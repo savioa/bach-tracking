@@ -6,16 +6,16 @@ struct WorkEditor: View {
     @Environment(\.dismiss) private var dismiss: DismissAction
     @Environment(\.modelContext) private var modelContext: ModelContext
 
-    @State private var name: String = ""
+    @State private var name = ""
     @State private var form: MusicalForm?
-    @State private var instruments: String = ""
-    @State private var number: String = ""
+    @State private var instruments = ""
+    @State private var number = ""
     @State private var tonality: Work.Tonality?
-    @State private var opus: String = ""
-    @State private var catalogue: String = ""
-    @State private var nickname: String = ""
-    @State private var detail: String = ""
-    @State private var newWork: Bool = true
+    @State private var opus = ""
+    @State private var catalogue = ""
+    @State private var nickname = ""
+    @State private var detail = ""
+    @State private var navigationTitle = "Nova Obra"
 
     @Query var forms: [MusicalForm]
 
@@ -52,16 +52,11 @@ struct WorkEditor: View {
                     TextField("Detalhe", text: $detail)
                 }
             }
-            .navigationTitle(newWork ? "Nova Obra" : "")
+            .navigationTitle(navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancelar") { dismiss() }
-                }
-
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Salvar") { save() }.disabled(name.isEmpty && form == nil)
-                }
+                FormToolbar.items(
+                    isConfirmDisabled: name.isEmpty && form == nil, onConfirm: { save() })
             }
         }
         .onAppear {
@@ -75,7 +70,7 @@ struct WorkEditor: View {
                 catalogue = work.catalogue
                 nickname = work.nickname
                 detail = work.detail
-                newWork = false
+                navigationTitle = ""
             }
         }
     }

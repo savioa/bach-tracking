@@ -31,8 +31,7 @@ class Concert: Identifiable {
 
     init(
         id: UUID = UUID(), date: Date, venue: Venue, series: Series?, seriesInstance: Int?,
-        name: String,
-        performances: [Performance]
+        name: String, performances: [Performance]
     ) {
         self.id = id
         self.date = date

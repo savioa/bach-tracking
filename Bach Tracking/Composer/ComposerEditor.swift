@@ -6,9 +6,9 @@ struct ComposerEditor: View {
     @Environment(\.dismiss) var dismiss: DismissAction
     @Environment(\.modelContext) private var modelContext: ModelContext
 
-    @State private var fullName: String = ""
-    @State private var shortName: String = ""
-    @State private var newComposer: Bool = true
+    @State private var fullName = ""
+    @State private var shortName = ""
+    @State private var navigationTitle = "Novo Compositor"
 
     let composer: Composer?
 
@@ -23,23 +23,18 @@ struct ComposerEditor: View {
                         capitalization: .words)
                 }
             }
-            .navigationTitle(newComposer ? "Novo Compositor" : "")
+            .navigationTitle(navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancelar", role: .cancel) { dismiss() }
-                }
-
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Salvar") { save() }.disabled(!fullName.contains(shortName))
-                }
+                FormToolbar.items(
+                    isConfirmDisabled: !fullName.contains(shortName), onConfirm: { save() })
             }
         }
         .onAppear {
             if let composer: Composer {
                 fullName = composer.fullName
                 shortName = composer.shortName
-                newComposer = false
+                navigationTitle = ""
             }
         }
     }

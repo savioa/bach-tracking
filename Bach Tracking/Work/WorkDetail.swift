@@ -6,7 +6,7 @@ struct WorkDetail: View {
     @Environment(\.dismiss) var dismiss: DismissAction
     @Environment(\.modelContext) private var modelContext: ModelContext
 
-    @State private var isEditing: Bool = false
+    @State private var isEditing = false
 
     let work: Work
 
@@ -18,20 +18,21 @@ struct WorkDetail: View {
                 }
             }
 
-            Section("Compositor") {
+            ProminentSection("Compositor") {
                 NavigationLink {
                     ComposerDetail(composer: work.composer)
                 } label: {
                     Text(work.composer.fullName)
                 }
             }
-            .headerProminence(.increased)
 
             if !work.performances.isEmpty {
-                Section("Execuções") {
-                    let concerts: [Concert] = Array(Set(work.performances.compactMap { $0.concert }))
+                ProminentSection("Execuções") {
+                    let concerts: [Concert] = Array(
+                        Set(work.performances.compactMap { $0.concert }))
 
-                    ForEach(concerts.sorted { $0.date > $1.date }
+                    ForEach(
+                        concerts.sorted { $0.date > $1.date }
                     ) { performance in
                         NavigationLink {
                             ConcertDetail(concert: performance)
@@ -42,14 +43,10 @@ struct WorkDetail: View {
                         }
                     }
                 }
-                .headerProminence(.increased)
             }
 
             if work.primaryTitle.count > 20 {
-                Section("Título") {
-                    Text(work.primaryTitle)
-                }
-                .headerProminence(.increased)
+                ProminentSection("Título") { Text(work.primaryTitle) }
             }
         }
         .listStyle(.plain)
@@ -58,11 +55,7 @@ struct WorkDetail: View {
         .sheet(isPresented: $isEditing) {
             WorkEditor(work: work, composer: work.composer)
         }
-        .toolbar {
-            ToolbarItem(placement: .primaryAction) {
-                Button("Editar") { isEditing = true }
-            }
-        }
+        .toolbar { EditButtonToolbarItem(isEditing: $isEditing) }
 
         if work.performances.isEmpty {
             DeleteButton(item: work) {

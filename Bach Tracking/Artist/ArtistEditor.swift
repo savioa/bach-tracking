@@ -6,9 +6,9 @@ struct ArtistEditor: View {
     @Environment(\.dismiss) var dismiss: DismissAction
     @Environment(\.modelContext) private var modelContext: ModelContext
 
-    @State private var name: String = ""
+    @State private var name = ""
     @State private var type: ArtistType?
-    @State private var newArtist: Bool = true
+    @State private var navigationTitle = "Novo Artista"
 
     @Query(sort: \ArtistType.name) private var artistTypes: [ArtistType]
 
@@ -24,23 +24,18 @@ struct ArtistEditor: View {
                         title: "Tipo", items: artistTypes, selection: $type, label: { $0.name })
                 }
             }
-            .navigationTitle(newArtist ? "Novo Artista" : "")
+            .navigationTitle(navigationTitle)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancelar", role: .cancel) { dismiss() }
-                }
-
-                ToolbarItem(placement: .confirmationAction) {
-                    Button("Salvar") { save() }.disabled(name.isEmpty || type == nil)
-                }
+                FormToolbar.items(
+                    isConfirmDisabled: name.isEmpty || type == nil, onConfirm: { save() })
             }
         }
         .onAppear {
             if let artist: Artist {
                 name = artist.name
                 type = artist.type
-                newArtist = false
+                navigationTitle = ""
             }
         }
     }

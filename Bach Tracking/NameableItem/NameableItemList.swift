@@ -2,7 +2,7 @@ import SwiftData
 import SwiftUI
 
 struct NameableItemList<T: Nameable & PersistentModel>: View {
-    @State private var isAdding: Bool = false
+    @State private var isAdding = false
 
     @Query(sort: \T.name) private var list: [T]
 

@@ -2,7 +2,7 @@ import NukeUI
 import SwiftUI
 
 struct Portrait: View {
-    @State private var hasFailed: Bool = false
+    @State private var hasFailed = false
 
     var name: String
 

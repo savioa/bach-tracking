@@ -5,7 +5,7 @@ struct CustomMenuPicker<Item: Identifiable & Hashable>: View {
     let items: [Item]
     @Binding var selection: Item?
     let label: (Item) -> String
-    var nilTitle: String = ""
+    var nilTitle = ""
 
     var body: some View {
         Menu {
