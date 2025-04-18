@@ -211,11 +211,7 @@ struct PerformanceEditor: View {
                         selection: $work, label: { $0.primaryTitle }
                     )
 
-                    Picker("Bis", selection: $isEncore) {
-                        Text("-").tag(false)
-                        Text("Bis").tag(true)
-                    }
-                    .pickerStyle(.segmented)
+                    Toggle("Bis", isOn: $isEncore)
 
                     TextField("Detalhe", text: $detail)
                 }
