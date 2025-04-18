@@ -21,7 +21,7 @@ struct ConcertList: View {
         }
 
         List {
-            ForEach(Array(groupedConcerts.keys.sorted()), id: \.self) { yearMonth in
+            ForEach(Array(groupedConcerts.keys.sorted().reversed()), id: \.self) { yearMonth in
                 ProminentSection(formatter.string(for: groupedConcerts[yearMonth]![0].date)!) {
                     let concertsByMonth: [Concert]? = groupedConcerts[yearMonth]?.sorted {
                         $0.date > $1.date
