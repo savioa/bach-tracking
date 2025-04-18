@@ -12,8 +12,14 @@ struct CustomMenuPicker<Item: Identifiable & Hashable>: View {
             if !nilTitle.isEmpty {
                 Button(nilTitle) { selection = nil }
             }
-            ForEach(items) { item in
-                Button(label(item)) { selection = item }
+
+            if let first = items.first {
+                Button(label(first)) { selection = first }
+                    .onAppear { UIApplication.shared.dismissKeyboard() }
+
+                ForEach(items.dropFirst()) { item in
+                    Button(label(item)) { selection = item }
+                }
             }
         } label: {
             HStack {
@@ -27,5 +33,11 @@ struct CustomMenuPicker<Item: Identifiable & Hashable>: View {
                     .foregroundColor(Color(uiColor: .placeholderText))
             }
         }
+    }
+}
+
+extension UIApplication {
+    func dismissKeyboard() {
+        sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
 }
