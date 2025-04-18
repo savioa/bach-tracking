@@ -7,6 +7,15 @@ struct ComposerEditor: View {
     @Environment(\.modelContext) private var modelContext: ModelContext
 
     @FocusState private var focusedField: Bool
+    @FocusState private var isShortNameFocused: Bool
+
+    var suggestions: [String] {
+        if isShortNameFocused {
+            return fullName.split(separator: " ").map { String($0) }
+        } else {
+            return []
+        }
+    }
 
     @State private var fullName = ""
     @State private var shortName = ""
@@ -23,7 +32,24 @@ struct ComposerEditor: View {
 
                     PrefixedTextField(
                         prefix: "ou apenas", placeholder: "Nome resumido", text: $shortName,
-                        capitalization: .words)
+                        capitalization: .words
+                    )
+                    .focused($isShortNameFocused)
+
+                    if !suggestions.isEmpty {
+                        ScrollView(.horizontal, showsIndicators: false) {
+                            HStack {
+                                ForEach(suggestions, id: \.self) { suggestion in
+                                    Button {
+                                        shortName = suggestion
+                                        isShortNameFocused = false
+                                    } label: {
+                                        Text(suggestion).padding(5)
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
             .navigationTitle(navigationTitle)
