@@ -6,6 +6,8 @@ struct WorkEditor: View {
     @Environment(\.dismiss) private var dismiss: DismissAction
     @Environment(\.modelContext) private var modelContext: ModelContext
 
+    @FocusState private var focusedField: Bool
+
     @State private var name = ""
     @State private var form: MusicalForm?
     @State private var instruments = ""
@@ -27,6 +29,7 @@ struct WorkEditor: View {
             Form {
                 Section {
                     TextField("Nome", text: $name)
+                        .focused($focusedField)
 
                     CustomMenuPicker(
                         title: "Forma", items: forms, selection: $form, label: { $0.name },
@@ -71,6 +74,8 @@ struct WorkEditor: View {
                 nickname = work.nickname
                 detail = work.detail
                 navigationTitle = ""
+            } else {
+                focusedField = true
             }
         }
     }

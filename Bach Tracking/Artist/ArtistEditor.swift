@@ -6,6 +6,8 @@ struct ArtistEditor: View {
     @Environment(\.dismiss) var dismiss: DismissAction
     @Environment(\.modelContext) private var modelContext: ModelContext
 
+    @FocusState private var focusedField: Bool
+
     @State private var name = ""
     @State private var type: ArtistType?
     @State private var navigationTitle = "Novo Artista"
@@ -19,6 +21,7 @@ struct ArtistEditor: View {
             Form {
                 Section {
                     TextField("Nome", text: $name).textInputAutocapitalization(.words)
+                        .focused($focusedField)
 
                     CustomMenuPicker(
                         title: "Tipo", items: artistTypes, selection: $type, label: { $0.name })
@@ -36,6 +39,8 @@ struct ArtistEditor: View {
                 name = artist.name
                 type = artist.type
                 navigationTitle = ""
+            } else {
+                focusedField = true
             }
         }
     }

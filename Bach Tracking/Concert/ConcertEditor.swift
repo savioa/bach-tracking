@@ -5,6 +5,8 @@ struct ConcertEditor: View {
     @Environment(\.dismiss) var dismiss: DismissAction
     @Environment(\.modelContext) private var modelContext: ModelContext
 
+    @FocusState private var focusedField: Bool
+
     @State private var name = ""
     @State private var date = Date.now
     @State private var venue: Venue?
@@ -29,6 +31,7 @@ struct ConcertEditor: View {
             Form {
                 Section {
                     TextField("Nome", text: $name).textInputAutocapitalization(.words)
+                        .focused($focusedField)
 
                     DatePicker(selection: $date) {
                         Text("Data")
@@ -110,6 +113,8 @@ struct ConcertEditor: View {
                 seriesInstance = concert.seriesInstance.map(String.init) ?? ""
                 performances = concert.performances.sorted { !$0.encore && $1.encore }
                 navigationTitle = ""
+            } else {
+                focusedField = true
             }
         }
     }

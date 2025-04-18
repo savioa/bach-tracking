@@ -6,6 +6,8 @@ struct ComposerEditor: View {
     @Environment(\.dismiss) var dismiss: DismissAction
     @Environment(\.modelContext) private var modelContext: ModelContext
 
+    @FocusState private var focusedField: Bool
+
     @State private var fullName = ""
     @State private var shortName = ""
     @State private var navigationTitle = "Novo Compositor"
@@ -17,6 +19,7 @@ struct ComposerEditor: View {
             Form {
                 Section {
                     TextField("Nome completo", text: $fullName).textInputAutocapitalization(.words)
+                        .focused($focusedField)
 
                     PrefixedTextField(
                         prefix: "ou apenas", placeholder: "Nome resumido", text: $shortName,
@@ -35,6 +38,8 @@ struct ComposerEditor: View {
                 fullName = composer.fullName
                 shortName = composer.shortName
                 navigationTitle = ""
+            } else {
+                focusedField = true
             }
         }
     }

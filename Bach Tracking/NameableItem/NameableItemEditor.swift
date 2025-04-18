@@ -5,6 +5,8 @@ struct NameableItemEditor<T: Nameable & PersistentModel>: View {
     @Environment(\.dismiss) var dismiss: DismissAction
     @Environment(\.modelContext) private var modelContext: ModelContext
 
+    @FocusState private var focusedField: Bool
+
     @State private var name = ""
     @State private var navigationTitle = T.newItemLabel
 
@@ -15,6 +17,7 @@ struct NameableItemEditor<T: Nameable & PersistentModel>: View {
             Form {
                 Section {
                     TextField("Nome", text: $name)
+                        .focused($focusedField)
                 }
             }
             .navigationTitle(navigationTitle)
@@ -27,6 +30,8 @@ struct NameableItemEditor<T: Nameable & PersistentModel>: View {
             if let item: T {
                 name = item.name
                 navigationTitle = ""
+            } else {
+                focusedField = true
             }
         }
     }
