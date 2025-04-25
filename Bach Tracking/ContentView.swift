@@ -232,8 +232,9 @@ struct Lists: View {
                         let encoder = JSONEncoder()
                         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
 
-                        if let jsonData = try? encoder.encode(concerts.map { ConcertDTO(from: $0) })
-                        {
+                        let concertsDTO = concerts.map { ConcertDTO(from: $0) }
+
+                        if let jsonData = try? encoder.encode(concertsDTO) {
                             json = JsonDocument(json: jsonData)
                         }
                     } label: {
@@ -325,7 +326,7 @@ struct JsonDocument: FileDocument {
     init(configuration: ReadConfiguration) throws {
         guard
             let data = configuration.file.regularFileContents
-        else { throw NSError() }
+        else { throw NSError(domain: "bach-up", code: 1) }
         self.json = data
     }
 
