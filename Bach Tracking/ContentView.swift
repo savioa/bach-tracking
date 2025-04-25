@@ -1,6 +1,7 @@
 import Combine
 import SwiftData
 import SwiftUI
+import UniformTypeIdentifiers
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext: ModelContext
@@ -87,6 +88,9 @@ struct Lists: View {
     @Query(sort: \Concert.date) private var concerts: [Concert]
 
     @ObservedObject var searchManager: SearchManager
+
+    @State private var isExporting = false
+    @State private var json: JsonDocument?
 
     var body: some View {
         if isSearching {
@@ -216,20 +220,35 @@ struct Lists: View {
             }
             .navigationTitle("Bach Tracking")
             .onAppear {
-                let encoder = JSONEncoder()
-                encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-
-                concerts.forEach { concert in
-                    if let jsonData = try? encoder.encode(ConcertDTO(from: concert)) {
-                        if let jsonString = String(data: jsonData, encoding: .utf8) {
-                            print(jsonString)
-                        }
-                    }
-                }
-
                 UNUserNotificationCenter.current().requestAuthorization(
                     options: [.alert, .badge, .sound]) { _, _ in
                     }
+            }
+            .toolbar {
+                ToolbarItem(placement: .primaryAction) {
+                    Button {
+                        isExporting = true
+
+                        let encoder = JSONEncoder()
+                        encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
+
+                        if let jsonData = try? encoder.encode(concerts.map { ConcertDTO(from: $0) })
+                        {
+                            json = JsonDocument(json: jsonData)
+                        }
+                    } label: {
+                        Image(systemName: "square.and.arrow.up")
+                    }
+                    .fileExporter(
+                        isPresented: $isExporting,
+                        document: json,
+                        contentType: .json,
+                        defaultFilename: "bach-up.json",
+                        onCompletion: { result in
+                            print(result)
+                        }
+                    )
+                }
             }
         }
     }
@@ -296,6 +315,26 @@ struct MainNavigationLink<Destination: View>: View {
                 Text(String(count))
             }
         }
+    }
+}
+
+struct JsonDocument: FileDocument {
+    static var readableContentTypes: [UTType] { [.json] }
+    var json: Data
+
+    init(configuration: ReadConfiguration) throws {
+        guard
+            let data = configuration.file.regularFileContents
+        else { throw NSError() }
+        self.json = data
+    }
+
+    init(json: Data) {
+        self.json = json
+    }
+
+    func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
+        FileWrapper(regularFileWithContents: self.json)
     }
 }
 
