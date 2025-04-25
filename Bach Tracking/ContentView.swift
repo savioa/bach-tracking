@@ -138,7 +138,7 @@ struct Lists: View {
                 if let previousConcert {
                     ProminentSection("Um ano atrás") {
                         NavigationLink {
-                            ConcertDetail(concert: previousConcert)
+                            ConcertDetail(concerts: [previousConcert], selected: previousConcert)
                         } label: {
                             let composerNames = Set(
                                 previousConcert.performances.compactMap { $0.work.composer }
@@ -160,7 +160,7 @@ struct Lists: View {
                 if let nextConcert {
                     ProminentSection("Próximo concerto") {
                         NavigationLink {
-                            ConcertDetail(concert: nextConcert)
+                            ConcertDetail(concerts: [nextConcert], selected: nextConcert)
                         } label: {
                             let composerNames = Set(
                                 nextConcert.performances.compactMap { $0.work.composer }

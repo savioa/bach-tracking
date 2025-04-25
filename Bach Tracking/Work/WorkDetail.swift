@@ -29,17 +29,16 @@ struct WorkDetail: View {
             if !work.performances.isEmpty {
                 ProminentSection("Execuções") {
                     let concerts: [Concert] = Array(
-                        Set(work.performances.compactMap { $0.concert }))
+                        Set(work.performances.compactMap { $0.concert })
+                    ).sorted { $0.date > $1.date }
 
-                    ForEach(
-                        concerts.sorted { $0.date > $1.date }
-                    ) { performance in
+                    ForEach(concerts) { concert in
                         NavigationLink {
-                            ConcertDetail(concert: performance)
+                            ConcertDetail(concerts: concerts, selected: concert)
                         } label: {
                             MultilineRow(
-                                firstLine: Text(performance.title),
-                                secondLine: Text(performance.date.formatted()))
+                                firstLine: Text(concert.title),
+                                secondLine: Text(concert.date.formatted()))
                         }
                     }
                 }

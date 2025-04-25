@@ -4,7 +4,7 @@ import SwiftUI
 struct ConcertList: View {
     @State private var isAdding = false
 
-    @Query private var concerts: [Concert]
+    @Query(sort: \Concert.date, order: .reverse) private var concerts: [Concert]
 
     var body: some View {
         var formatter: DateFormatter {
@@ -29,7 +29,7 @@ struct ConcertList: View {
 
                     ForEach(concertsByMonth ?? [], id: \.id) { concert in
                         NavigationLink {
-                            ConcertDetail(concert: concert)
+                            ConcertDetail(concerts: concerts, selected: concert)
                         } label: {
                             MultilineConcertRow(concert: concert)
                         }

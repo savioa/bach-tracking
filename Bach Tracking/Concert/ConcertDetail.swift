@@ -1,7 +1,7 @@
 import SwiftData
 import SwiftUI
 
-struct ConcertDetail: View {
+struct InnerConcertDetail: View {
     @Environment(\.dismiss) var dismiss: DismissAction
     @Environment(\.modelContext) private var modelContext: ModelContext
 
@@ -68,5 +68,39 @@ struct ConcertDetail: View {
                         withIdentifiers: [concert.id.uuidString])
                 }
             }
+    }
+}
+
+struct ConcertDetail: View {
+    let concerts: [Concert]
+    @State private var currentIndex: Int
+
+    init(concerts: [Concert], selected: Concert) {
+        self.concerts = concerts
+        _currentIndex = State(
+            initialValue: concerts.firstIndex(where: { $0.id == selected.id }) ?? 0)
+    }
+
+    var body: some View {
+        InnerConcertDetail(concert: concerts[currentIndex])
+            .gesture(
+                DragGesture()
+                    .onEnded { value in
+                        if value.translation.width < -50 {
+                            if currentIndex < concerts.count - 1 {
+                                currentIndex += 1
+                            } else {
+                                currentIndex = 0
+                            }
+                        } else if value.translation.width > 50 {
+                            if currentIndex > 0 {
+                                currentIndex -= 1
+                            } else {
+                                currentIndex = concerts.count - 1
+                            }
+                        }
+                    }
+            )
+            .animation(.easeInOut, value: currentIndex)
     }
 }

@@ -48,7 +48,8 @@ extension Series {
             links.append(
                 AnyView(
                     NavigationLink {
-                        ConcertDetail(concert: concert)
+                        ConcertDetail(
+                            concerts: concerts.sorted { $0.date > $1.date }, selected: concert)
                     } label: {
                         MultilineConcertRow(concert: concert)
                     }))
@@ -94,7 +95,8 @@ extension Venue {
             links.append(
                 AnyView(
                     NavigationLink {
-                        ConcertDetail(concert: concert)
+                        ConcertDetail(
+                            concerts: concerts.sorted { $0.date > $1.date }, selected: concert)
                     } label: {
                         MultilineConcertRow(concert: concert)
                     }))

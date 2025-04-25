@@ -20,7 +20,7 @@ struct ArtistDetail: View {
                 ProminentSection("Concertos") {
                     ForEach(artist.concerts) { concert in
                         NavigationLink {
-                            ConcertDetail(concert: concert)
+                            ConcertDetail(concerts: artist.concerts, selected: concert)
                         } label: {
                             MultilineConcertRow(concert: concert)
                         }
