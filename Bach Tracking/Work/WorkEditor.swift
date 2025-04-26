@@ -19,7 +19,7 @@ struct WorkEditor: View {
     @State private var detail = ""
     @State private var navigationTitle = "Nova Obra"
 
-    @Query var forms: [MusicalForm]
+    @Query(sort: \MusicalForm.name) var forms: [MusicalForm]
 
     let work: Work?
     let composer: Composer
@@ -30,6 +30,7 @@ struct WorkEditor: View {
                 Section {
                     TextField("Nome", text: $name)
                         .focused($focusedField)
+                        .disableAutocorrection(true)
 
                     CustomMenuPicker(
                         title: "Forma", items: forms, selection: $form, label: { $0.name },
@@ -51,8 +52,10 @@ struct WorkEditor: View {
                     TextField("Identificação em catálogo", text: $catalogue)
 
                     TextField("Apelido", text: $nickname)
+                        .disableAutocorrection(true)
 
                     TextField("Detalhe", text: $detail)
+                        .disableAutocorrection(true)
                 }
             }
             .navigationTitle(navigationTitle)
