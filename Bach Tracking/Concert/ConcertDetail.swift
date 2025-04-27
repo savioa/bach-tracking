@@ -32,7 +32,19 @@ struct InnerConcertDetail: View {
                     NavigationLink {
                         ArtistDetail(artist: artist)
                     } label: {
-                        MultilineArtistRow(artist: artist)
+                        if concert.performances.allSatisfy({ $0.artists.contains(artist) }) {
+                            MultilineArtistRow(artist: artist)
+                        } else {
+                            let matchingIndices = concert.performances.sorted { !$0.encore && $1.encore }.enumerated()
+                                .compactMap { index, performance in
+                                    performance.artists.contains(artist) ? index + 1 : nil
+                                }
+                                .map { String($0) }.joined(separator: ", ")
+
+                            MultilineRow(
+                                firstLine: Text("\(artist.name) (\(matchingIndices))"), secondLine: Text(artist.type.name)
+                            )
+                        }
                     }
                 }
             }
