@@ -4,7 +4,7 @@ import SwiftData
 @Model
 class Artist: Identifiable {
     var id: UUID
-    @Attribute(.unique)
+    // @Attribute(.unique)
     var name: String
     var type: ArtistType
     @Relationship(inverse: \Performance.artists)
