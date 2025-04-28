@@ -309,11 +309,28 @@ struct ArtistListEditor: View {
                         }
                     }
 
-                    CustomMenuPicker(
-                        title: "Artista",
-                        items: artistType?.artists.sorted { $0.name < $1.name } ?? [],
-                        selection: $artist, label: { $0.name }
-                    )
+                    // CustomMenuPicker(
+                    //     title: "Artista",
+                    //     items: artistType?.artists.sorted { $0.name < $1.name } ?? [],
+                    //     selection: $artist, label: { $0.name }
+                    // )
+                }
+
+                if let artistType {
+                    Section {
+                        ForEach(artistType.artists.sorted { $0.name < $1.name }) { artistInType in
+                            Button {
+                                artist = artistInType
+                                onAdd(artist!)
+                                dismiss()
+                            } label: {
+                                MultilineArtistRow(artist: artistInType)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .contentShape(Rectangle())
+                            }
+                            .buttonStyle(.plain)
+                        }
+                    }
                 }
             }
             .toolbar {
