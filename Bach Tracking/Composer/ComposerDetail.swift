@@ -25,7 +25,7 @@ struct ComposerDetail: View {
                 if composer.works.isEmpty {
                     Text("Nenhuma obra cadastrada")
                 } else {
-                    ForEach(composer.works) { work in
+                    ForEach(composer.works.sorted { $0.primaryTitle < $1.primaryTitle }) { work in
                         NavigationLink {
                             WorkDetail(work: work)
                         } label: {

@@ -30,7 +30,7 @@ struct ConcertEditor: View {
         NavigationStack {
             Form {
                 Section {
-                    TextField("Nome", text: $name).textInputAutocapitalization(.words)
+                    TextField("Nome", text: $name)
                         .focused($focusedField)
 
                     DatePicker(selection: $date) {
