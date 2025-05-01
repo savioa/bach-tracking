@@ -288,7 +288,14 @@ struct ArtistListEditor: View {
     @State private var artistType: ArtistType?
     @State private var artist: Artist?
 
-    @Query(sort: \ArtistType.name) private var artistTypes: [ArtistType]
+    @Query(filter: #Predicate<ArtistType> { $0.name == "Regente" || $0.name == "Conjunto" }) private
+        var commomTypes: [ArtistType]
+
+    @Query(
+        filter: #Predicate<ArtistType> {
+            !$0.artists.isEmpty && $0.name != "Regente" && $0.name != "Conjunto"
+        }, sort: \.name)
+    private var artistTypes: [ArtistType]
 
     var onAdd: (Artist) -> Void
 
@@ -298,7 +305,7 @@ struct ArtistListEditor: View {
                 Section {
                     CustomMenuPicker(
                         title: "Tipo de artista",
-                        items: artistTypes.filter { !($0.artists.isEmpty) },
+                        items: commomTypes + artistTypes,
                         selection: $artistType, label: { $0.name }
                     )
                     .onChange(of: artistType) {
