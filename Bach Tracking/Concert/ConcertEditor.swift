@@ -149,7 +149,7 @@ struct ConcertEditor: View {
     fileprivate func registerNotification() {
         if let concert {
             let content = UNMutableNotificationContent()
-            content.title = "Um ano atrás..."
+            content.title = "Neste mesmo dia..."
             content.subtitle = "\(concert.title)"
             content.body = concert.performances.compactMap { $0.work.composer.shortName }.joined(
                 separator: ", ")
@@ -158,11 +158,11 @@ struct ConcertEditor: View {
             let oneYearLater = Calendar.current.date(byAdding: .year, value: 1, to: concert.date)!
 
             var dateComponents = Calendar.current.dateComponents(
-                [.year, .month, .day], from: oneYearLater)
+                [.month, .day], from: oneYearLater)
             dateComponents.hour = 9
 
             let trigger = UNCalendarNotificationTrigger(
-                dateMatching: dateComponents, repeats: false)
+                dateMatching: dateComponents, repeats: true)
 
             let request = UNNotificationRequest(
                 identifier: concert.id.uuidString, content: content,
@@ -216,50 +216,54 @@ struct PerformanceEditor: View {
                     TextField("Detalhe", text: $detail)
                 }
 
-                ProminentSection(
-                    header: SectionHeaderWithAddButton(
-                        sectionHeaderText: "Artistas", accessibilityLabel: "Adicionar novo artista",
-                        isAdding: $isAddingArtist)
-                ) {
-                    if artists.isEmpty {
-                        Text("Nenhum artista cadastrado")
-                    } else {
-                        ForEach(artists) { artist in
-                            MultilineArtistRow(artist: artist)
-                                .swipeActions(edge: .trailing) {
-                                    Button(role: .destructive) {
-                                        artists.removeAll { $0.id == artist.id }
-                                    } label: {
-                                        Label("Remover", systemImage: "minus.circle.fill")
-                                    }
-                                }
-                        }
-                    }
-                }
-
-                let suggestions = referencedArtists.filter { referenced in
-                    !artists.contains(where: { $0.id == referenced.id })
-                }
-
-                if suggestions.count > 0 {
-                    Section(
-                        header: Text("Sugestões"),
-                        footer: Text("Clique em um artista para relacioná-lo à execução da obra")
+                if work != nil {
+                    ProminentSection(
+                        header: SectionHeaderWithAddButton(
+                            sectionHeaderText: "Artistas",
+                            accessibilityLabel: "Adicionar novo artista",
+                            isAdding: $isAddingArtist)
                     ) {
-                        ForEach(suggestions) { artist in
-                            Button {
-                                if !artists.contains(where: { $0.id == artist.id }) {
-                                    artists.append(artist)
-                                }
-                            } label: {
+                        if artists.isEmpty {
+                            Text("Nenhum artista cadastrado")
+                        } else {
+                            ForEach(artists) { artist in
                                 MultilineArtistRow(artist: artist)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                                    .contentShape(Rectangle())
+                                    .swipeActions(edge: .trailing) {
+                                        Button(role: .destructive) {
+                                            artists.removeAll { $0.id == artist.id }
+                                        } label: {
+                                            Label("Remover", systemImage: "minus.circle.fill")
+                                        }
+                                    }
                             }
-                            .buttonStyle(.plain)
                         }
                     }
-                    .headerProminence(.increased)
+
+                    let suggestions = referencedArtists.filter { referenced in
+                        !artists.contains(where: { $0.id == referenced.id })
+                    }
+
+                    if suggestions.count > 0 {
+                        Section(
+                            header: Text("Sugestões"),
+                            footer: Text(
+                                "Clique em um artista para relacioná-lo à execução da obra")
+                        ) {
+                            ForEach(suggestions) { artist in
+                                Button {
+                                    if !artists.contains(where: { $0.id == artist.id }) {
+                                        artists.append(artist)
+                                    }
+                                } label: {
+                                    MultilineArtistRow(artist: artist)
+                                        .frame(maxWidth: .infinity, alignment: .leading)
+                                        .contentShape(Rectangle())
+                                }
+                                .buttonStyle(.plain)
+                            }
+                        }
+                        .headerProminence(.increased)
+                    }
                 }
             }
             .sheet(isPresented: $isAddingArtist) {

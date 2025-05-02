@@ -18,6 +18,12 @@ struct WorkDetail: View {
                 }
             }
 
+            if work.detail != "" {
+                ProminentSection("Detalhe") {
+                    Text(work.detail)
+                }
+            }
+
             ProminentSection("Compositor") {
                 NavigationLink {
                     ComposerDetail(composer: work.composer)
