@@ -86,6 +86,7 @@ struct Lists: View {
     @Environment(\.modelContext) private var modelContext: ModelContext
 
     @Query(sort: \Concert.date) private var concerts: [Concert]
+    @Query private var works: [Work]
 
     @ObservedObject var searchManager: SearchManager
 
@@ -223,6 +224,10 @@ struct Lists: View {
                 UNUserNotificationCenter.current().requestAuthorization(
                     options: [.alert, .badge, .sound]) { _, _ in
                     }
+
+                works.sorted { $0.primaryTitle < $1.primaryTitle }.forEach { work in
+                    print(work.primaryTitle)
+                }
             }
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {

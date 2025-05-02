@@ -51,7 +51,9 @@ struct ComposerList: View {
             ComposerEditor(composer: Composer?(nil))
         }
         .toolbar { AddButtonToolbarItem(isAdding: $isAdding) }
-        .searchable(text: $query, prompt: Text("Buscar"))
+        .searchable(
+            text: $query, placement: .navigationBarDrawer(displayMode: .always),
+            prompt: Text("Buscar"))
     }
 }
 
